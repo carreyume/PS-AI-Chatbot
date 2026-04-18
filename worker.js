@@ -55,4 +55,28 @@ export default {
         fetch("https://api.airtable.com/v0/app7DmMJ9iAnbeVYl/tblPrlzzOx3wUDViO", {
           method: "POST",
           headers: {
-            "Content-Type": "applicat
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${env.AIRTABLE_API_KEY}`,
+          },
+          body: JSON.stringify({
+            fields: {
+              "Timestamp": new Date().toISOString(),
+              "Conversation": conversation,
+              "Last Message": lastMsg,
+              "Session ID": Math.random().toString(36).slice(2, 9)
+            }
+          })
+        });
+
+        return new Response(JSON.stringify(data), {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        });
+      }
+    }
+
+    return env.ASSETS.fetch(request);
+  },
+};
