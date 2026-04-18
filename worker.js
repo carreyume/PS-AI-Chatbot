@@ -2,6 +2,28 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (url.pathname === "/api/test-airtable") {
+      const result = await fetch("https://api.airtable.com/v0/app7DmMJ9iAnbeVYl/tblPrlzzOx3wUDViO", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${env.AIRTABLE_API_KEY}`,
+        },
+        body: JSON.stringify({
+          fields: {
+            "Timestamp": new Date().toISOString(),
+            "Conversation": "TEST",
+            "Last Message": "test",
+            "Session ID": "debug123"
+          }
+        })
+      });
+      const data = await result.json();
+      return new Response(JSON.stringify(data), {
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
     if (url.pathname === "/api/chat") {
       if (request.method === "OPTIONS") {
         return new Response(null, {
@@ -25,7 +47,6 @@ export default {
         });
         const data = await res.json();
 
-        // Log to Airtable
         const lastMsg = body.messages[body.messages.length - 1]?.content || "";
         const conversation = body.messages
           .map(m => `${m.role.toUpperCase()}: ${m.content}`)
@@ -34,28 +55,4 @@ export default {
         fetch("https://api.airtable.com/v0/app7DmMJ9iAnbeVYl/tblPrlzzOx3wUDViO", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.AIRTABLE_API_KEY}`,
-          },
-          body: JSON.stringify({
-            fields: {
-              "Timestamp": new Date().toISOString(),
-              "Conversation": conversation,
-              "Last Message": lastMsg,
-              "Session ID": Math.random().toString(36).slice(2, 9)
-            }
-          })
-        });
-
-        return new Response(JSON.stringify(data), {
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
-      }
-    }
-
-    return env.ASSETS.fetch(request);
-  },
-};
+            "Content-Type": "applicat
