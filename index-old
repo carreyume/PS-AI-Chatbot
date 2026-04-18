@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot Comprehensive Roadmap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Include the Frappe Gantt library for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc; /* Light background */
+        }
+        .step-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: default;
+        }
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        .timeline-line {
+            height: 4px;
+            background: linear-gradient(to right, #0077b6, #00b4d8);
+            margin: 0 -1.5rem; /* Extend line slightly beyond card padding */
+        }
+        /* Frappe Gantt Custom Styling */
+        .gantt .bar-label { fill: #03045e; font-weight: 600; }
+        .gantt .bar-progress { fill: #00b4d8; }
+        /* New custom class for the Pilot Phase */
+        .gantt .bar-wrapper.pilot-phase .bar { fill: #4b5563; } /* Dark Gray for Pilot */
+        .gantt .bar-wrapper.short-term .bar { fill: #0077b6; } /* pcu-blue */
+        .gantt .bar-wrapper.mid-term .bar { fill: #00b4d8; } /* pcu-teal */
+        .gantt .bar-wrapper.long-term .bar { fill: #03045e; } /* pcu-dark */
+
+        .gantt-container { overflow-x: auto; padding: 1rem 0; }
+        
+        /* Map Styles for the visualization */
+        .map-area {
+            position: relative;
+            padding: 2rem;
+            min-height: 250px;
+        }
+        .geo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            position: absolute;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 119, 182, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0); }
+        }
+
+        @media (max-width: 1024px) {
+            .timeline-line {
+                width: 4px;
+                height: 100%;
+                margin: 0 auto;
+            }
+        }
+        /* Flowchart Styles */
+        .flow-step {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            position: relative;
+            min-height: 50px;
+        }
+        .flow-actor {
+            width: 110px;
+            min-width: 110px;
+            text-align: right;
+            padding-right: 1rem;
+            font-weight: 700;
+        }
+        .flow-line {
+            margin: 0.5rem 0;
+            text-align: center;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .flow-stage-header {
+            text-align: center;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #03045e;
+            padding: 0.5rem 0;
+            margin-top: 1rem;
+            border-bottom: 2px solid #03045e;
+            display: block;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 lg:p-12">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pcu-blue': '#0077b6',
+                        'pcu-teal': '#00b4d8',
+                        'pcu-dark': '#03045e',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-10 lg:p-12">
+        
+        <!-- HEADER & CORE VALUE -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-pcu-dark mb-2">
+                Peterson Solutions AI Communication Tool: Comprehensive Roadmap
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Integrating Strategy, Timeline, Benefits, and Deep Operational Flow
+            </p>
+            <div class="mt-6 inline-block px-6 py-2 bg-pcu-teal text-white font-bold rounded-full shadow-lg">
+                STRATEGIC OBJECTIVE: Enhance Client Engagement & Accelerate Sales Cycle
+            </div>
+        </header>
+
+        <!-- CORE CAPABILITIES (The What) -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-pcu-dark mb-8 border-b border-gray-200 pb-4">
+                1. Core AI Capabilities (The Pilot Model)
+            </h2>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">The AI tool operates across three fundamental steps, acting as a smart 24/7 Digital Concierge.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Capability 1: Listen & Understand (Step 01) -->
+                <div class="flex flex-col items-center text-center p-6 bg-blue-50/70 rounded-xl shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-pcu-blue mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    <h3 class="text-xl font-semibold text-gray-800">LISTEN & UNDERSTAND</h3>
+                    <p class="mt-2 text-gray-600 text-sm">Reads chat/voice notes, detects customer intent, and provides instant, natural replies 24/7.</p>
+                </div>
+                <!-- Capability 2: Qualify & Triage (Step 02) -->
+                <div class="flex flex-col items-center text-center p-6 bg-blue-50/70 rounded-xl shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-pcu-blue mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="M18 13.5L10.5 6"/></svg>
+                    <h3 class="text-xl font-semibold text-gray-800">LEAD QUALIFICATION</h3>
+                    <p class="mt-2 text-gray-600 text-sm">Uses SOPs and FAQs to qualify leads precisely, handing off only high-value prospects to human staff.</p>
+                </div>
+                <!-- Capability 3: Book & Confirm (Step 03) -->
+                <div class="flex flex-col items-center text-center p-6 bg-blue-50/70 rounded-xl shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-pcu-blue mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                    <h3 class="text-xl font-semibold text-gray-800">BOOK & CONFIRM</h3>
+                    <p class="mt-2 text-gray-600 text-sm">Automatically suggests available slots, books appointments, and sends smart follow-up reminders.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- OPERATIONAL BENEFITS & IMPACT (The Why) -->
+        <section class="mb-16 pt-8 border-t border-gray-200">
+            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-8">
+                2. Operational Benefits & Impact
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Customer Experience -->
+                <div class="p-6 bg-pcu-teal/10 rounded-xl shadow-md">
+                    <h3 class="text-2xl font-bold text-pcu-teal mb-4">Customer Experience</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <span class="text-pcu-teal text-xl mr-3">🚀</span>
+                            <div>
+                                <strong class="font-semibold text-pcu-dark">Instant Service:</strong> Leads get immediate, knowledgeable replies any time of day, enhancing the perception of Peterson as a modern, reliable partner.
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-pcu-teal text-xl mr-3">✨</span>
+                            <div>
+                                <strong class="font-semibold text-pcu-dark">Personalization:</strong> Expert intent recognition ensures the AI response is always relevant to the specific service (e.g., ESG, Certification, Inspection).
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Internal Efficiency -->
+                <div class="p-6 bg-pcu-blue/10 rounded-xl shadow-md">
+                    <h3 class="text-2xl font-bold text-pcu-blue mb-4">Internal Efficiency</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <span class="text-pcu-blue text-xl mr-3">⏱️</span>
+                            <div>
+                                <strong class="font-semibold text-pcu-dark">Time Savings:</strong> Reduces the time spent by consultants/sales on initial triage and appointment scheduling by up to <strong>80%</strong>.
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-pcu-blue text-xl mr-3">🎯</span>
+                            <div>
+                                <strong class="font-semibold text-pcu-dark">Focus on Value:</strong> Human experts are freed to concentrate on <strong>high-value consulting</strong> and closing complex deals.
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-pcu-blue text-xl mr-3">📊</span>
+                            <div>
+                                <strong class="font-semibold text-pcu-dark">Better Data:</strong> Syncs lead details and conversation context directly into integrated apps (CRM/Slack/Gmail), improving tracking and follow-up.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEEP COMMUNICATION FLOWCHART (The How - Logic) -->
+        <section class="mt-16 pt-8 border-t border-gray-200">
+            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-8">
+                3. Deep Communication Flow: Lead Qualification and Triage
+            </h2>
+            <p class="text-center text-gray-600 mb-6 max-w-4xl mx-auto">
+                The Peterson Sustainability Assistant uses this flow to efficiently qualify leads and triage them to the correct action (Booking or Information).
+            </p>
+            <div class="max-w-xl mx-auto p-4 bg-gray-50 rounded-xl shadow-lg border border-gray-200">
+                
+                <span class="flow-stage-header">STAGE 1: LEAD IDENTIFICATION</span>
+
+                <div class="flow-step bg-pcu-teal/10 border-l-4 border-pcu-teal">
+                    <div class="flow-actor text-pcu-teal">AI (Start)</div>
+                    <div class="flex-grow">Greets user, states purpose, and initiates <strong>Personal Contact Data</strong> collection (Name, Email, Company, Phone).</div>
+                </div>
+
+                <div class="flow-line">
+                    <svg class="w-6 h-6 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7m0 0l-7-7m7 7V5"></path></svg>
+                    <span class="text-xs font-normal">Data Collected and Synced to CRM</span>
+                </div>
+                
+                <span class="flow-stage-header">STAGE 2: NEEDS QUALIFICATION (6 Questions)</span>
+
+                <div class="flow-step bg-blue-100 border-l-4 border-pcu-blue">
+                    <div class="flow-actor text-pcu-blue">AI (Qualify)</div>
+                    <div class="flex-grow">Asks 6 key questions: 
+                        <ul class="list-disc ml-4 mt-1 text-sm font-normal text-gray-700">
+                            <li><strong>Certification Type</strong> (e.g., RSPO, FSC, MSC)</li>
+                            <li><strong>Supply Chain Part</strong> (e.g., Farm/Forest, Processing, Logistics)</li>
+                            <li><strong>Focus Area</strong> (e.g., Carbon/GHG, Social Compliance, Traceability)</li>
+                            <li><strong>Service Request</strong> (e.g., Consultancy, Certification Audit Support, Training)</li>
+                            <li><strong>Region</strong> (Production/Sourcing countries)</li>
+                            <li><strong>Site Count</strong> (Number of facilities)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flow-line">
+                    <svg class="w-6 h-6 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7m0 0l-7-7m7 7V5"></path></svg>
+                    <span class="text-xs font-normal">Intent and Scope Defined</span>
+                </div>
+
+                <div class="flow-step bg-yellow-100 border-l-4 border-yellow-500">
+                    <div class="flow-actor text-yellow-600">AI (Triage)</div>
+                    <div class="flex-grow">Asks final question: <strong>"Would you like to book a consultation/training session?"</strong></div>
+                </div>
+                
+                <div class="flow-line text-sm grid grid-cols-2 gap-4">
+                    <div class="text-green-600 font-bold">IF YES: Booking Path</div>
+                    <div class="text-red-600 font-bold">IF NO: Info Path</div>
+                </div>
+
+                <span class="flow-stage-header">STAGE 3: ACTION & CONFIRMATION</span>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- BOOKING PATH -->
+                    <div class="flow-step bg-green-100 border-l-4 border-green-500">
+                        <div class="flow-actor text-green-600">BOOKING</div>
+                        <div class="flex-grow text-sm">AI asks for <strong>Preferred Date/Time</strong>. <strong>Executes Calendar API</strong> call. Sends <strong>Final Booking Confirmation</strong> Email.</div>
+                    </div>
+                    <!-- INFO PATH -->
+                    <div class="flow-step bg-red-100 border-l-4 border-red-500">
+                        <div class="flow-actor text-red-600">INFO SEND</div>
+                        <div class="flex-grow text-sm">AI asks for <strong>Specific Topics</strong> of interest. <strong>Triggers Email</strong> with tailored information and offerings.</div>
+                    </div>
+                </div>
+                
+                <div class="flow-line">
+                    <svg class="w-6 h-6 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7m0 0l-7-7m7 7V5"></path></svg>
+                </div>
+
+                <div class="flow-step bg-pcu-dark/10 border-l-4 border-pcu-dark">
+                    <div class="flow-actor text-pcu-dark">AI (End)</div>
+                    <div class="flex-grow">Logs final outcome to CRM and sends <strong>Thank You/Sign-off</strong>.</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PHASED ADOPTION TIMELINE (The When - Strategic Overview) -->
+        <section class="relative mt-16 pt-8 border-t border-gray-200">
+            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-12">
+                4. Phased Adoption Timeline
+            </h2>
+
+            <div class="timeline-line hidden lg:block absolute top-1/2 left-0 right-0 transform -translate-y-1/2 -z-10"></div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
+                
+                <!-- New Pilot Phase -->
+                <div class="step-card bg-white border-4 border-gray-500 rounded-2xl p-6 shadow-xl relative lg:col-span-1">
+                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-gray-600 text-white rounded-full text-2xl font-extrabold shadow-lg">0</div>
+                    <h3 class="text-2xl font-bold text-gray-600 mt-4 lg:mt-0 mb-4 text-center lg:text-left">
+                        Pilot & Validation
+                    </h3>
+                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        Focus: Malaysia Adoption (Nov 2025 - Feb 2026)
+                    </p>
+                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
+                        <li><span class="font-semibold text-pcu-dark">Objective:</span> Complete 4-month Pilot in <strong>Malaysia</strong> to validate use cases and refine AI training data.</li>
+                        <li><span class="font-semibold text-pcu-dark">Action:</span> Rigorous <strong>A/B testing</strong> against human triage; finalization of success metrics.</li>
+                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> Pilot Completion Report and <strong>Regional Replication Ready</strong> sign-off.</li>
+                        <li><span class="font-semibold text-pcu-dark">Goal:</span> Achieve <strong>>90% intent detection accuracy</strong> in the pilot market.</li>
+                    </ul>
+                </div>
+
+                <!-- Phase 1: Short Term -->
+                <div class="step-card bg-white border-4 border-pcu-teal rounded-2xl p-6 shadow-xl relative lg:col-span-1">
+                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-pcu-teal text-white rounded-full text-2xl font-extrabold shadow-lg">1</div>
+                    <h3 class="text-2xl font-bold text-pcu-teal mt-4 lg:mt-0 mb-4 text-center lg:text-left">
+                        Short Term
+                    </h3>
+                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        Focus: Regional Foundation (Mar 2026 - Aug 2026)
+                    </p>
+                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
+                        <li><span class="font-semibold text-pcu-dark">Objective:</span> Launch in <strong>2 New Strategic SEA Markets</strong>.</li>
+                        <li><span class="font-semibold text-pcu-dark">Action:</span> Refine AI training for <strong>local language and business nuances</strong>.</li>
+                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> Creation of a <strong>Localization Playbook</strong> and a <strong>Unified Regional Data Dashboard</strong>.</li>
+                        <li><span class="font-semibold text-pcu-dark">Goal:</span> <strong>80% reduction</strong> in human staff time spent on unqualified leads.</li>
+                    </ul>
+                </div>
+
+                <!-- Phase 2: Mid Term -->
+                <div class="step-card bg-white border-4 border-pcu-blue rounded-2xl p-6 shadow-xl relative lg:col-span-1">
+                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-pcu-blue text-white rounded-full text-2xl font-extrabold shadow-lg">2</div>
+                    <h3 class="text-2xl font-bold text-pcu-blue mt-4 lg:mt-0 mb-4 text-center lg:text-left">
+                        Mid Term
+                    </h3>
+                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        Focus: SEA Saturation (Sep 2026 - May 2027)
+                    </p>
+                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
+                        <li><span class="font-semibold text-pcu-dark">Objective:</span> <strong>Expand to all remaining high-priority SEA countries</strong> (full saturation).</li>
+                        <li><span class="font-semibold text-pcu-dark">Action:</span> Develop advanced features like <strong>voice note processing</strong> and JSON data output.</li>
+                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> AI covers <strong>80% of SEA market footprint</strong>; establishment of a <strong>Regional AI Governance Framework</strong>.</li>
+                        <li><span class="font-semibold text-pcu-dark">Goal:</span> Achieve <strong>>90% accuracy</strong> in intent detection and complete <strong>Global Scalability Assessment</strong>.</li>
+                    </ul>
+                </div>
+
+                <!-- Phase 3: Long Term -->
+                <div class="step-card bg-white border-4 border-pcu-dark rounded-2xl p-6 shadow-xl relative lg:col-span-1">
+                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-pcu-dark text-white rounded-full text-2xl font-extrabold shadow-lg">3</div>
+                    <h3 class="text-2xl font-bold text-pcu-dark mt-4 lg:mt-0 mb-4 text-center lg:text-left">
+                        Long Term
+                    </h3>
+                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        Focus: Global Deployment (Jun 2027 - End)
+                    </p>
+                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
+                        <li><span class="font-semibold text-pcu-dark">Objective:</span> Launch in <strong>Tier 1 Global Markets</strong> (Europe, N. America, LATAM, APAC).</li>
+                        <li><span class="font-semibold text-pcu-dark">Action:</span> Integrate AI into <strong>post-sales services</strong> (Client Lifecycle Assistant).</li>
+                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> AI is the <strong>standard digital concierge</strong> across <strong>90% of global operations</strong>.</li>
+                        <li><span class="font-semibold text-pcu-dark">Goal:</span> Implement <strong>Autonomous Optimization</strong> with continuous learning loops.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+        
+        <!-- MULTI-LAYERED ROADMAP VISUALIZATION (Geographic & Dependencies) -->
+        <section class="mt-16 pt-8 border-t border-gray-200">
+            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-10">
+                5. Multi-Layered Roadmap: Geography & Dependencies
+            </h2>
+
+            <!-- 5a. Dependency Flow Diagram (Arc Alternative) -->
+            <div class="max-w-4xl mx-auto mb-16 text-center p-6 bg-gray-50 rounded-xl shadow-inner">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Phase Dependency Flow</h3>
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8">
+                    
+                    <div class="p-3 bg-gray-500/20 border border-gray-500 rounded-lg font-semibold text-pcu-dark shadow-md w-40">PILOT (Malaysia)</div>
+                    <svg class="w-6 h-6 sm:w-10 sm:h-6 text-pcu-teal transform rotate-90 sm:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    
+                    <div class="p-3 bg-pcu-teal/20 border border-pcu-teal rounded-lg font-semibold text-pcu-dark shadow-md w-40">PHASE 1 (Foundation)</div>
+                    <svg class="w-6 h-6 sm:w-10 sm:h-6 text-pcu-blue transform rotate-90 sm:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    
+                    <div class="p-3 bg-pcu-blue/20 border border-pcu-blue rounded-lg font-semibold text-pcu-dark shadow-md w-40">PHASE 2 (Saturation)</div>
+                    <svg class="w-6 h-6 sm:w-10 sm:h-6 text-pcu-dark transform rotate-90 sm:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    
+                    <div class="p-3 bg-pcu-dark/20 border border-pcu-dark rounded-lg font-semibold text-pcu-dark shadow-md w-40">PHASE 3 (Global Scale)</div>
+                </div>
+            </div>
+
+            <!-- 5b. Geographic Scaling Map (Heatmap Alternative) -->
+            <div class="max-w-5xl mx-auto p-6 bg-gray-100 rounded-xl shadow-inner mb-16">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Geographic Market Rollout</h3>
+                <div class="map-area bg-white rounded-lg border border-gray-300 relative overflow-hidden">
+                    
+                    <!-- Simplified World Map Representation -->
+                    <div class="absolute inset-0 opacity-10 font-extrabold text-gray-400 text-center text-6xl leading-tight pointer-events-none">
+                        GLOBAL<br>DEPLOYMENT
+                    </div>
+
+                    <!-- P3: Global Deployment Area (Europe, N. America, LATAM) -->
+                    <div class="absolute w-full h-full bg-pcu-dark/10"></div>
+                    <span class="absolute top-1/4 left-1/4 text-sm font-bold text-pcu-dark">Europe / N. America</span>
+                    
+                    <!-- P2: SEA Saturation Area -->
+                    <div class="absolute w-3/4 h-3/4 bottom-0 right-0 bg-pcu-blue/10"></div>
+                    <span class="absolute bottom-1/4 right-1/4 text-sm font-bold text-pcu-blue">Full SEA Saturation</span>
+                    
+                    <!-- P1: Initial Replication Area -->
+                    <div class="absolute w-1/3 h-1/3 bottom-10 right-10 bg-pcu-teal/10"></div>
+                    <span class="absolute bottom-1/2 right-1/2 text-sm font-bold text-pcu-teal">Initial SEA Markets (3)</span>
+                    
+                    <!-- Key Dots -->
+                    <div class="geo-dot bg-gray-600 border-2 border-white" style="top: 80%; left: 70%; animation-delay: 0s;" title="Pilot Market (Malaysia)"></div>
+                    <div class="geo-dot bg-pcu-teal border-2 border-white" style="top: 75%; left: 65%; animation-delay: 0.5s;" title="Phase 1 Replication Market"></div>
+                    <div class="geo-dot bg-pcu-blue border-2 border-white" style="top: 85%; left: 75%; animation-delay: 1s;" title="Phase 2 Saturation Market"></div>
+                    <div class="geo-dot bg-pcu-dark border-2 border-white" style="top: 40%; left: 20%; animation-delay: 1.5s;" title="Phase 3 Global Market"></div>
+                    <div class="geo-dot bg-pcu-dark border-2 border-white" style="top: 30%; left: 70%; animation-delay: 2s;" title="Phase 3 Global Market"></div>
+
+                </div>
+                <div class="flex justify-center space-x-6 mt-4 text-xs font-medium">
+                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-600 mr-2"></span>Pilot: Malaysia Validation</span>
+                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-pcu-teal mr-2"></span>Phase 1: Regional Replication</span>
+                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-pcu-blue mr-2"></span>Phase 2: SEA Saturation</span>
+                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-pcu-dark mr-2"></span>Phase 3: Global Deployment</span>
+                </div>
+            </div>
+
+            <!-- 5c. DETAILED SCALING GANTT CHART -->
+            <h3 class="text-2xl font-extrabold text-center text-pcu-dark mb-8">
+                Development and Scaling Gantt Chart
+            </h3>
+            <p class="text-center text-gray-600 mb-6">
+                Tracking key deliverables and technical dependencies over time (Time Scale: Month)
+            </p>
+            <div id="gantt-chart-container" class="gantt-container overflow-x-auto rounded-xl border border-gray-200 p-4 bg-gray-50 shadow-inner">
+                <svg id="gantt-chart"></svg>
+            </div>
+        </section>
+        
+        <!-- FOOTER -->
+        <footer class="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
+            Prepared by Ahmad Qaiyum, Peterson Solutions (Malaysia)
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tasks = [
+                // Pilot Phase: Malaysia (Nov 2025 - Feb 2026)
+                {
+                    id: 'pilot_malaysia',
+                    name: 'Malaysia Pilot Deployment & Validation',
+                    start: '2025-11-01',
+                    end: '2026-02-28',
+                    progress: 100, // Assuming initial deployment is done, now validation
+                    custom_class: 'pilot-phase',
+                },
+                
+                // Phase 1: Short Term (Starting March 2026)
+                {
+                    id: 'p1_playbook',
+                    name: 'Refine Playbook & Localization SOPs',
+                    start: '2026-03-01',
+                    end: '2026-04-30',
+                    progress: 0,
+                    custom_class: 'short-term',
+                    dependencies: 'pilot_malaysia',
+                },
+                {
+                    id: 'p1_market_rep',
+                    name: 'Regional Replication (2 New SEA Markets)',
+                    start: '2026-05-01',
+                    end: '2026-07-31',
+                    progress: 0,
+                    custom_class: 'short-term',
+                    dependencies: 'p1_playbook',
+                },
+                {
+                    id: 'p1_dashboard',
+                    name: 'Unified Regional Data Dashboard',
+                    start: '2026-05-01',
+                    end: '2026-08-31',
+                    progress: 0,
+                    custom_class: 'short-term',
+                },
+
+                // Phase 2: Mid Term (Starting Sep 2026)
+                {
+                    id: 'p2_sea_sat',
+                    name: 'SEA Saturation (Remaining Markets)',
+                    start: '2026-09-01',
+                    end: '2027-01-31',
+                    progress: 0,
+                    custom_class: 'mid-term',
+                    dependencies: 'p1_market_rep, p1_dashboard',
+                },
+                {
+                    id: 'p2_voice',
+                    name: 'Develop Voice Note Processing',
+                    start: '2026-10-01',
+                    end: '2027-03-31',
+                    progress: 0,
+                    custom_class: 'mid-term',
+                },
+                {
+                    id: 'p2_gov',
+                    name: 'Regional AI Governance Framework',
+                    start: '2027-02-01',
+                    end: '2027-05-31',
+                    progress: 0,
+                    custom_class: 'mid-term',
+                },
+
+                // Phase 3: Long Term (Starting June 2027)
+                {
+                    id: 'p3_global_deploy',
+                    name: 'Global Deployment (Tier 1 Markets)',
+                    start: '2027-06-01',
+                    end: '2028-06-30',
+                    progress: 0,
+                    custom_class: 'long-term',
+                    dependencies: 'p2_gov',
+                },
+                {
+                    id: 'p3_integration',
+                    name: 'Post-Sales Integration (Client Lifecycle)',
+                    start: '2027-10-01',
+                    end: '2028-10-31',
+                    progress: 0,
+                    custom_class: 'long-term',
+                    dependencies: 'p3_global_deploy',
+                },
+                {
+                    id: 'p3_optimize',
+                    name: 'Autonomous Optimization Implementation',
+                    start: '2028-04-01',
+                    end: '2028-12-31',
+                    progress: 0,
+                    custom_class: 'long-term',
+                    dependencies: 'p3_integration',
+                }
+            ];
+
+            // Initialize Gantt Chart
+            const gantt = new Gantt("#gantt-chart", tasks, {
+                header_height: 50,
+                column_width: 30,
+                step: 24,
+                view_modes: ['Month'],
+                bar_height: 20,
+                bar_corner_radius: 3,
+                arrow_curve: 5,
+                padding: 18,
+                language: 'en',
+                date_format: 'YYYY-MM-DD',
+                view_mode: 'Month',
+            });
+            gantt.change_view_mode('Month');
+        });
+    </script>
+</body>
+</html>
