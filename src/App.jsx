@@ -334,7 +334,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "var(--font-sans)", maxWidth: 720, margin: "0 auto", padding: "1.5rem 1rem" }}>
-      <h2 className="sr-only">Peterson Solutions AI Chatbot — Global Pitch Tool</h2>
+      <h2 className="sr-only">Peterson Solutions AI Chatbot</h2>
 
       <div style={{ marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
