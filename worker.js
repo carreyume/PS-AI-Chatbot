@@ -52,21 +52,27 @@ export default {
           .map(m => `${m.role.toUpperCase()}: ${m.content}`)
           .join(" | ");
 
-        fetch("https://api.airtable.com/v0/app7DmMJ9iAnbeVYl/tblPrlzzOx3wUDViO", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.AIRTABLE_API_KEY}`,
-          },
-          body: JSON.stringify({
-            fields: {
-              "Timestamp": new Date().toISOString(),
-              "Conversation": conversation,
-              "Last Message": lastMsg,
-              "Session ID": Math.random().toString(36).slice(2, 9)
-            }
-          })
-        });
+        try {
+          const atRes = await fetch("https://api.airtable.com/v0/app7DmMJ9iAnbeVYl/tblPrlzzOx3wUDViO", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${env.AIRTABLE_API_KEY}`,
+            },
+            body: JSON.stringify({
+              fields: {
+                "Timestamp": new Date().toISOString(),
+                "Conversation": conversation,
+                "Last Message": lastMsg,
+                "Session ID": Math.random().toString(36).slice(2, 9)
+              }
+            })
+          });
+          const atData = await atRes.json();
+          console.log("Airtable response:", JSON.stringify(atData));
+        } catch (err) {
+          console.log("Airtable error:", err.message);
+        }
 
         return new Response(JSON.stringify(data), {
           headers: {
