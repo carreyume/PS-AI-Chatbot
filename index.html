@@ -1,575 +1,391 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot Comprehensive Roadmap</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Include the Frappe Gantt library for visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fc; /* Light background */
-        }
-        .step-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: default;
-        }
-        .step-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        .timeline-line {
-            height: 4px;
-            background: linear-gradient(to right, #0077b6, #00b4d8);
-            margin: 0 -1.5rem; /* Extend line slightly beyond card padding */
-        }
-        /* Frappe Gantt Custom Styling */
-        .gantt .bar-label { fill: #03045e; font-weight: 600; }
-        .gantt .bar-progress { fill: #00b4d8; }
-        /* New custom class for the Pilot Phase */
-        .gantt .bar-wrapper.pilot-phase .bar { fill: #4b5563; } /* Dark Gray for Pilot */
-        .gantt .bar-wrapper.short-term .bar { fill: #0077b6; } /* pcu-blue */
-        .gantt .bar-wrapper.mid-term .bar { fill: #00b4d8; } /* pcu-teal */
-        .gantt .bar-wrapper.long-term .bar { fill: #03045e; } /* pcu-dark */
+import { useState, useRef, useEffect } from "react";
 
-        .gantt-container { overflow-x: auto; padding: 1rem 0; }
-        
-        /* Map Styles for the visualization */
-        .map-area {
-            position: relative;
-            padding: 2rem;
-            min-height: 250px;
-        }
-        .geo-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            position: absolute;
-            animation: pulse 1.5s infinite;
-        }
+const BRAND = "#1D9E75";
+const BRAND_LIGHT = "#E1F5EE";
+const BRAND_DARK = "#085041";
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(0, 119, 182, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 119, 182, 0); }
-        }
+const SYSTEM_PROMPT = `You are the Peterson Solutions Sustainability Assistant — a professional AI chatbot for Peterson Solutions, a global sustainability consultancy specialising in ESG, certifications (RSPO, FSC, MSC, MSPO, GOTS), supply chain audits, and training.
 
-        @media (max-width: 1024px) {
-            .timeline-line {
-                width: 4px;
-                height: 100%;
-                margin: 0 auto;
-            }
-        }
-        /* Flowchart Styles */
-        .flow-step {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            position: relative;
-            min-height: 50px;
-        }
-        .flow-actor {
-            width: 110px;
-            min-width: 110px;
-            text-align: right;
-            padding-right: 1rem;
-            font-weight: 700;
-        }
-        .flow-line {
-            margin: 0.5rem 0;
-            text-align: center;
-            font-weight: 600;
-            color: #4b5563;
-        }
-        .flow-stage-header {
-            text-align: center;
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #03045e;
-            padding: 0.5rem 0;
-            margin-top: 1rem;
-            border-bottom: 2px solid #03045e;
-            display: block;
-        }
-    </style>
-</head>
-<body class="p-4 sm:p-8 lg:p-12">
+Your job is to qualify leads through a structured conversation. Follow this exact flow:
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'pcu-blue': '#0077b6',
-                        'pcu-teal': '#00b4d8',
-                        'pcu-dark': '#03045e',
-                    }
-                }
-            }
-        }
-    </script>
+STEP 1 - Greeting: Introduce yourself warmly and collect: Full Name, Company, Email, Phone.
+STEP 2 - Qualification (ask one at a time):
+  Q1: What certification are they interested in? (RSPO, FSC, MSC, MSPO, GOTS, or other)
+  Q2: Which part of their supply chain? (Farm/Forest, Processing, Logistics, Retail)
+  Q3: What is their focus area? (Carbon/GHG, Social Compliance, Traceability, Biodiversity)
+  Q4: What service do they need? (Consultancy, Certification Audit Support, Training, Gap Assessment)
+  Q5: Which region/country are their operations in?
+  Q6: How many production sites/facilities?
+STEP 3 - Triage: Ask if they'd like to book a consultation or receive information by email.
+STEP 4 - Based on answer, either confirm a booking slot or say tailored info will be sent. Thank them.
 
-    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-10 lg:p-12">
-        
-        <!-- HEADER & CORE VALUE -->
-        <header class="text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-pcu-dark mb-2">
-                Peterson Solutions AI Communication Tool: Comprehensive Roadmap
-            </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Integrating Strategy, Timeline, Benefits, and Deep Operational Flow
-            </p>
-            <div class="mt-6 inline-block px-6 py-2 bg-pcu-teal text-white font-bold rounded-full shadow-lg">
-                STRATEGIC OBJECTIVE: Enhance Client Engagement & Accelerate Sales Cycle
+Be concise, professional, friendly. Ask ONE question at a time. Keep replies under 60 words.`;
+
+const CURRENCIES = [
+  { code: "MYR", symbol: "RM", name: "Malaysia", flag: "🇲🇾", salary: 4500, ai: 800 },
+  { code: "SGD", symbol: "S$", name: "Singapore", flag: "🇸🇬", salary: 5500, ai: 1200 },
+  { code: "IDR", symbol: "Rp", name: "Indonesia", flag: "🇮🇩", salary: 8000000, ai: 1500000 },
+  { code: "THB", symbol: "฿", name: "Thailand", flag: "🇹🇭", salary: 35000, ai: 6000 },
+  { code: "PHP", symbol: "₱", name: "Philippines", flag: "🇵🇭", salary: 35000, ai: 6000 },
+  { code: "VND", symbol: "₫", name: "Vietnam", flag: "🇻🇳", salary: 18000000, ai: 3500000 },
+  { code: "USD", symbol: "$", name: "USA / Global", flag: "🌐", salary: 5000, ai: 1200 },
+  { code: "EUR", symbol: "€", name: "Europe", flag: "🇪🇺", salary: 4500, ai: 1000 },
+  { code: "GBP", symbol: "£", name: "UK", flag: "🇬🇧", salary: 3800, ai: 900 },
+  { code: "AUD", symbol: "A$", name: "Australia", flag: "🇦🇺", salary: 7000, ai: 1500 },
+  { code: "INR", symbol: "₹", name: "India", flag: "🇮🇳", salary: 60000, ai: 12000 },
+  { code: "JPY", symbol: "¥", name: "Japan", flag: "🇯🇵", salary: 350000, ai: 70000 },
+  { code: "CNY", symbol: "¥", name: "China", flag: "🇨🇳", salary: 18000, ai: 3500 },
+  { code: "BRL", symbol: "R$", name: "Brazil", flag: "🇧🇷", salary: 8000, ai: 1500 },
+];
+
+const PHASE_TEMPLATES = [
+  { name: "Month 1–2", title: "Setup & Training", desc: "Configure AI with local SOPs, FAQs, certification knowledge. Train on local language nuances.", color: BRAND },
+  { name: "Month 3–4", title: "Pilot Launch", desc: "Go live with selected lead channels. Run A/B testing against human triage. Track intent accuracy.", color: "#378ADD" },
+  { name: "Month 5–6", title: "Optimise & Validate", desc: "Refine AI responses based on real data. Achieve >90% intent accuracy. Produce Pilot Report.", color: "#7F77DD" },
+  { name: "Month 7+", title: "Full Deployment", desc: "Hand off qualified leads to country sales team. Integrate with CRM. Expand channels (WhatsApp, web).", color: "#D85A30" },
+];
+
+const STATS = [
+  { label: "Available", value: "24/7", sub: "AI never sleeps" },
+  { label: "Triage time saved", value: "80%", sub: "per lead handled" },
+  { label: "Intent accuracy", value: ">90%", sub: "post-optimisation" },
+  { label: "Response time", value: "<3s", sub: "vs. hours for humans" },
+];
+
+function fmt(n, symbol, code) {
+  if (["IDR","VND","JPY"].includes(code)) return symbol + " " + Math.round(n).toLocaleString();
+  return symbol + " " + Math.round(n).toLocaleString();
+}
+
+function ROICalculator() {
+  const [selIdx, setSelIdx] = useState(0);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const cur = CURRENCIES[selIdx];
+
+  const [leads, setLeads] = useState(80);
+  const [staffCount, setStaffCount] = useState(2);
+  const [salary, setSalary] = useState(cur.salary);
+  const [hoursPerLead, setHoursPerLead] = useState(1.5);
+  const [aiMonthly, setAiMonthly] = useState(cur.ai);
+
+  function selectCurrency(i) {
+    const c = CURRENCIES[i];
+    setSelIdx(i);
+    setSalary(c.salary);
+    setAiMonthly(c.ai);
+    setShowDropdown(false);
+  }
+
+  const workingHours = 160;
+  const hourlyRate = salary / workingHours;
+  const triageCost = leads * hoursPerLead * hourlyRate * staffCount;
+  const humanTotal = (salary * staffCount) + triageCost;
+  const saving = humanTotal - aiMonthly;
+  const savingPct = Math.round((saving / humanTotal) * 100);
+  const annualSaving = saving * 12;
+  const s = cur.symbol;
+  const c = cur.code;
+
+  const sliders = [
+    { label: "Leads per month", val: leads, set: setLeads, min: 10, max: 500, step: 10, disp: leads },
+    { label: "Sales staff (headcount)", val: staffCount, set: setStaffCount, min: 1, max: 20, step: 1, disp: staffCount },
+    { label: `Avg. staff salary (${c}/mo)`, val: salary, set: setSalary, min: Math.round(cur.salary * 0.3), max: Math.round(cur.salary * 3), step: Math.round(cur.salary * 0.05) || 1, disp: fmt(salary, s, c) },
+    { label: "Hours per lead (triage)", val: hoursPerLead, set: setHoursPerLead, min: 0.5, max: 8, step: 0.5, disp: hoursPerLead + "h" },
+  ];
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, position: "relative" }}>
+        <div style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>Market / Currency:</div>
+        <button onClick={() => setShowDropdown(!showDropdown)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 8, border: `1.5px solid ${BRAND}`, background: BRAND_LIGHT, color: BRAND_DARK, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+          <span style={{ fontSize: 16 }}>{cur.flag}</span> {cur.name} ({cur.code}) ▾
+        </button>
+        {showDropdown && (
+          <div style={{ position: "absolute", top: 36, left: 120, zIndex: 10, background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "0.5px solid var(--color-border-secondary)", borderRadius: 10, width: 240, maxHeight: 280, overflowY: "auto" }}>
+            {CURRENCIES.map((c, i) => (
+              <div key={c.code} onClick={() => selectCurrency(i)} style={{ padding: "9px 14px", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, background: i === selIdx ? "rgba(29,158,117,0.12)" : "transparent", color: i === selIdx ? BRAND_DARK : "var(--color-text-primary)" }}>
+                <span style={{ fontSize: 15 }}>{c.flag}</span> {c.name} <span style={{ color: "var(--color-text-secondary)", marginLeft: "auto" }}>{c.code}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
+        {sliders.map(({ label, val, set, min, max, step, disp }) => (
+          <div key={label}>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>{label}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input type="range" min={min} max={max} step={step} value={val} onChange={e => set(+e.target.value)} style={{ flex: 1 }} />
+              <span style={{ fontSize: 12, fontWeight: 500, minWidth: 64, textAlign: "right" }}>{disp}</span>
             </div>
-        </header>
+          </div>
+        ))}
+      </div>
 
-        <!-- CORE CAPABILITIES (The What) -->
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold text-center text-pcu-dark mb-8 border-b border-gray-200 pb-4">
-                1. Core AI Capabilities (The Pilot Model)
-            </h2>
-            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">The AI tool operates across three fundamental steps, acting as a smart 24/7 Digital Concierge.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Capability 1: Listen & Understand (Step 01) -->
-                <div class="flex flex-col items-center text-center p-6 bg-blue-50/70 rounded-xl shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-pcu-blue mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                    <h3 class="text-xl font-semibold text-gray-800">LISTEN & UNDERSTAND</h3>
-                    <p class="mt-2 text-gray-600 text-sm">Reads chat/voice notes, detects customer intent, and provides instant, natural replies 24/7.</p>
-                </div>
-                <!-- Capability 2: Qualify & Triage (Step 02) -->
-                <div class="flex flex-col items-center text-center p-6 bg-blue-50/70 rounded-xl shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-pcu-blue mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="M18 13.5L10.5 6"/></svg>
-                    <h3 class="text-xl font-semibold text-gray-800">LEAD QUALIFICATION</h3>
-                    <p class="mt-2 text-gray-600 text-sm">Uses SOPs and FAQs to qualify leads precisely, handing off only high-value prospects to human staff.</p>
-                </div>
-                <!-- Capability 3: Book & Confirm (Step 03) -->
-                <div class="flex flex-col items-center text-center p-6 bg-blue-50/70 rounded-xl shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-pcu-blue mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                    <h3 class="text-xl font-semibold text-gray-800">BOOK & CONFIRM</h3>
-                    <p class="mt-2 text-gray-600 text-sm">Automatically suggests available slots, books appointments, and sends smart follow-up reminders.</p>
-                </div>
-            </div>
-        </section>
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>AI tool monthly cost ({c})</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <input type="range" min={Math.round(cur.ai * 0.2)} max={Math.round(cur.ai * 5)} step={Math.round(cur.ai * 0.05) || 1} value={aiMonthly} onChange={e => setAiMonthly(+e.target.value)} style={{ flex: 1 }} />
+          <span style={{ fontSize: 12, fontWeight: 500, minWidth: 80, textAlign: "right" }}>{fmt(aiMonthly, s, c)}</span>
+        </div>
+      </div>
 
-        <!-- OPERATIONAL BENEFITS & IMPACT (The Why) -->
-        <section class="mb-16 pt-8 border-t border-gray-200">
-            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-8">
-                2. Operational Benefits & Impact
-            </h2>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+        <div style={{ background: "#FEF2F2", border: "0.5px solid #FECACA", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11, color: "#991B1B", marginBottom: 4, fontWeight: 500 }}>Human team cost / month</div>
+          <div style={{ fontSize: 20, fontWeight: 500, color: "#7F1D1D" }}>{fmt(humanTotal, s, c)}</div>
+          <div style={{ fontSize: 11, color: "#B91C1C", marginTop: 4 }}>Salary + triage hours</div>
+        </div>
+        <div style={{ background: BRAND_LIGHT, border: "0.5px solid #9FE1CB", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11, color: BRAND_DARK, marginBottom: 4, fontWeight: 500 }}>AI assistant cost / month</div>
+          <div style={{ fontSize: 20, fontWeight: 500, color: BRAND_DARK }}>{fmt(aiMonthly, s, c)}</div>
+          <div style={{ fontSize: 11, color: "#0F6E56", marginTop: 4 }}>Flat subscription</div>
+        </div>
+      </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <!-- Customer Experience -->
-                <div class="p-6 bg-pcu-teal/10 rounded-xl shadow-md">
-                    <h3 class="text-2xl font-bold text-pcu-teal mb-4">Customer Experience</h3>
-                    <ul class="space-y-4 text-gray-700">
-                        <li class="flex items-start">
-                            <span class="text-pcu-teal text-xl mr-3">🚀</span>
-                            <div>
-                                <strong class="font-semibold text-pcu-dark">Instant Service:</strong> Leads get immediate, knowledgeable replies any time of day, enhancing the perception of Peterson as a modern, reliable partner.
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-pcu-teal text-xl mr-3">✨</span>
-                            <div>
-                                <strong class="font-semibold text-pcu-dark">Personalization:</strong> Expert intent recognition ensures the AI response is always relevant to the specific service (e.g., ESG, Certification, Inspection).
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Internal Efficiency -->
-                <div class="p-6 bg-pcu-blue/10 rounded-xl shadow-md">
-                    <h3 class="text-2xl font-bold text-pcu-blue mb-4">Internal Efficiency</h3>
-                    <ul class="space-y-4 text-gray-700">
-                        <li class="flex items-start">
-                            <span class="text-pcu-blue text-xl mr-3">⏱️</span>
-                            <div>
-                                <strong class="font-semibold text-pcu-dark">Time Savings:</strong> Reduces the time spent by consultants/sales on initial triage and appointment scheduling by up to <strong>80%</strong>.
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-pcu-blue text-xl mr-3">🎯</span>
-                            <div>
-                                <strong class="font-semibold text-pcu-dark">Focus on Value:</strong> Human experts are freed to concentrate on <strong>high-value consulting</strong> and closing complex deals.
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-pcu-blue text-xl mr-3">📊</span>
-                            <div>
-                                <strong class="font-semibold text-pcu-dark">Better Data:</strong> Syncs lead details and conversation context directly into integrated apps (CRM/Slack/Gmail), improving tracking and follow-up.
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- DEEP COMMUNICATION FLOWCHART (The How - Logic) -->
-        <section class="mt-16 pt-8 border-t border-gray-200">
-            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-8">
-                3. Deep Communication Flow: Lead Qualification and Triage
-            </h2>
-            <p class="text-center text-gray-600 mb-6 max-w-4xl mx-auto">
-                The Peterson Sustainability Assistant uses this flow to efficiently qualify leads and triage them to the correct action (Booking or Information).
-            </p>
-            <div class="max-w-xl mx-auto p-4 bg-gray-50 rounded-xl shadow-lg border border-gray-200">
-                
-                <span class="flow-stage-header">STAGE 1: LEAD IDENTIFICATION</span>
-
-                <div class="flow-step bg-pcu-teal/10 border-l-4 border-pcu-teal">
-                    <div class="flow-actor text-pcu-teal">AI (Start)</div>
-                    <div class="flex-grow">Greets user, states purpose, and initiates <strong>Personal Contact Data</strong> collection (Name, Email, Company, Phone).</div>
-                </div>
-
-                <div class="flow-line">
-                    <svg class="w-6 h-6 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7m0 0l-7-7m7 7V5"></path></svg>
-                    <span class="text-xs font-normal">Data Collected and Synced to CRM</span>
-                </div>
-                
-                <span class="flow-stage-header">STAGE 2: NEEDS QUALIFICATION (6 Questions)</span>
-
-                <div class="flow-step bg-blue-100 border-l-4 border-pcu-blue">
-                    <div class="flow-actor text-pcu-blue">AI (Qualify)</div>
-                    <div class="flex-grow">Asks 6 key questions: 
-                        <ul class="list-disc ml-4 mt-1 text-sm font-normal text-gray-700">
-                            <li><strong>Certification Type</strong> (e.g., RSPO, FSC, MSC)</li>
-                            <li><strong>Supply Chain Part</strong> (e.g., Farm/Forest, Processing, Logistics)</li>
-                            <li><strong>Focus Area</strong> (e.g., Carbon/GHG, Social Compliance, Traceability)</li>
-                            <li><strong>Service Request</strong> (e.g., Consultancy, Certification Audit Support, Training)</li>
-                            <li><strong>Region</strong> (Production/Sourcing countries)</li>
-                            <li><strong>Site Count</strong> (Number of facilities)</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="flow-line">
-                    <svg class="w-6 h-6 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7m0 0l-7-7m7 7V5"></path></svg>
-                    <span class="text-xs font-normal">Intent and Scope Defined</span>
-                </div>
-
-                <div class="flow-step bg-yellow-100 border-l-4 border-yellow-500">
-                    <div class="flow-actor text-yellow-600">AI (Triage)</div>
-                    <div class="flex-grow">Asks final question: <strong>"Would you like to book a consultation/training session?"</strong></div>
-                </div>
-                
-                <div class="flow-line text-sm grid grid-cols-2 gap-4">
-                    <div class="text-green-600 font-bold">IF YES: Booking Path</div>
-                    <div class="text-red-600 font-bold">IF NO: Info Path</div>
-                </div>
-
-                <span class="flow-stage-header">STAGE 3: ACTION & CONFIRMATION</span>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- BOOKING PATH -->
-                    <div class="flow-step bg-green-100 border-l-4 border-green-500">
-                        <div class="flow-actor text-green-600">BOOKING</div>
-                        <div class="flex-grow text-sm">AI asks for <strong>Preferred Date/Time</strong>. <strong>Executes Calendar API</strong> call. Sends <strong>Final Booking Confirmation</strong> Email.</div>
-                    </div>
-                    <!-- INFO PATH -->
-                    <div class="flow-step bg-red-100 border-l-4 border-red-500">
-                        <div class="flow-actor text-red-600">INFO SEND</div>
-                        <div class="flex-grow text-sm">AI asks for <strong>Specific Topics</strong> of interest. <strong>Triggers Email</strong> with tailored information and offerings.</div>
-                    </div>
-                </div>
-                
-                <div class="flow-line">
-                    <svg class="w-6 h-6 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7m0 0l-7-7m7 7V5"></path></svg>
-                </div>
-
-                <div class="flow-step bg-pcu-dark/10 border-l-4 border-pcu-dark">
-                    <div class="flow-actor text-pcu-dark">AI (End)</div>
-                    <div class="flex-grow">Logs final outcome to CRM and sends <strong>Thank You/Sign-off</strong>.</div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- PHASED ADOPTION TIMELINE (The When - Strategic Overview) -->
-        <section class="relative mt-16 pt-8 border-t border-gray-200">
-            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-12">
-                4. Phased Adoption Timeline
-            </h2>
-
-            <div class="timeline-line hidden lg:block absolute top-1/2 left-0 right-0 transform -translate-y-1/2 -z-10"></div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
-                
-                <!-- New Pilot Phase -->
-                <div class="step-card bg-white border-4 border-gray-500 rounded-2xl p-6 shadow-xl relative lg:col-span-1">
-                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-gray-600 text-white rounded-full text-2xl font-extrabold shadow-lg">0</div>
-                    <h3 class="text-2xl font-bold text-gray-600 mt-4 lg:mt-0 mb-4 text-center lg:text-left">
-                        Pilot & Validation
-                    </h3>
-                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                        Focus: Malaysia Adoption (Nov 2025 - Feb 2026)
-                    </p>
-                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
-                        <li><span class="font-semibold text-pcu-dark">Objective:</span> Complete 4-month Pilot in <strong>Malaysia</strong> to validate use cases and refine AI training data.</li>
-                        <li><span class="font-semibold text-pcu-dark">Action:</span> Rigorous <strong>A/B testing</strong> against human triage; finalization of success metrics.</li>
-                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> Pilot Completion Report and <strong>Regional Replication Ready</strong> sign-off.</li>
-                        <li><span class="font-semibold text-pcu-dark">Goal:</span> Achieve <strong>>90% intent detection accuracy</strong> in the pilot market.</li>
-                    </ul>
-                </div>
-
-                <!-- Phase 1: Short Term -->
-                <div class="step-card bg-white border-4 border-pcu-teal rounded-2xl p-6 shadow-xl relative lg:col-span-1">
-                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-pcu-teal text-white rounded-full text-2xl font-extrabold shadow-lg">1</div>
-                    <h3 class="text-2xl font-bold text-pcu-teal mt-4 lg:mt-0 mb-4 text-center lg:text-left">
-                        Short Term
-                    </h3>
-                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                        Focus: Regional Foundation (Mar 2026 - Aug 2026)
-                    </p>
-                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
-                        <li><span class="font-semibold text-pcu-dark">Objective:</span> Launch in <strong>2 New Strategic SEA Markets</strong>.</li>
-                        <li><span class="font-semibold text-pcu-dark">Action:</span> Refine AI training for <strong>local language and business nuances</strong>.</li>
-                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> Creation of a <strong>Localization Playbook</strong> and a <strong>Unified Regional Data Dashboard</strong>.</li>
-                        <li><span class="font-semibold text-pcu-dark">Goal:</span> <strong>80% reduction</strong> in human staff time spent on unqualified leads.</li>
-                    </ul>
-                </div>
-
-                <!-- Phase 2: Mid Term -->
-                <div class="step-card bg-white border-4 border-pcu-blue rounded-2xl p-6 shadow-xl relative lg:col-span-1">
-                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-pcu-blue text-white rounded-full text-2xl font-extrabold shadow-lg">2</div>
-                    <h3 class="text-2xl font-bold text-pcu-blue mt-4 lg:mt-0 mb-4 text-center lg:text-left">
-                        Mid Term
-                    </h3>
-                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                        Focus: SEA Saturation (Sep 2026 - May 2027)
-                    </p>
-                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
-                        <li><span class="font-semibold text-pcu-dark">Objective:</span> <strong>Expand to all remaining high-priority SEA countries</strong> (full saturation).</li>
-                        <li><span class="font-semibold text-pcu-dark">Action:</span> Develop advanced features like <strong>voice note processing</strong> and JSON data output.</li>
-                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> AI covers <strong>80% of SEA market footprint</strong>; establishment of a <strong>Regional AI Governance Framework</strong>.</li>
-                        <li><span class="font-semibold text-pcu-dark">Goal:</span> Achieve <strong>>90% accuracy</strong> in intent detection and complete <strong>Global Scalability Assessment</strong>.</li>
-                    </ul>
-                </div>
-
-                <!-- Phase 3: Long Term -->
-                <div class="step-card bg-white border-4 border-pcu-dark rounded-2xl p-6 shadow-xl relative lg:col-span-1">
-                    <div class="absolute lg:relative -top-6 lg:top-0 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-12 flex items-center justify-center bg-pcu-dark text-white rounded-full text-2xl font-extrabold shadow-lg">3</div>
-                    <h3 class="text-2xl font-bold text-pcu-dark mt-4 lg:mt-0 mb-4 text-center lg:text-left">
-                        Long Term
-                    </h3>
-                    <p class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                        Focus: Global Deployment (Jun 2027 - End)
-                    </p>
-                    <ul class="space-y-3 text-gray-700 list-none pl-0 text-sm">
-                        <li><span class="font-semibold text-pcu-dark">Objective:</span> Launch in <strong>Tier 1 Global Markets</strong> (Europe, N. America, LATAM, APAC).</li>
-                        <li><span class="font-semibold text-pcu-dark">Action:</span> Integrate AI into <strong>post-sales services</strong> (Client Lifecycle Assistant).</li>
-                        <li><span class="font-semibold text-pcu-dark">Deliverable:</span> AI is the <strong>standard digital concierge</strong> across <strong>90% of global operations</strong>.</li>
-                        <li><span class="font-semibold text-pcu-dark">Goal:</span> Implement <strong>Autonomous Optimization</strong> with continuous learning loops.</li>
-                    </ul>
-                </div>
-
-            </div>
-        </section>
-        
-        <!-- MULTI-LAYERED ROADMAP VISUALIZATION (Geographic & Dependencies) -->
-        <section class="mt-16 pt-8 border-t border-gray-200">
-            <h2 class="text-3xl font-extrabold text-center text-pcu-dark mb-10">
-                5. Multi-Layered Roadmap: Geography & Dependencies
-            </h2>
-
-            <!-- 5a. Dependency Flow Diagram (Arc Alternative) -->
-            <div class="max-w-4xl mx-auto mb-16 text-center p-6 bg-gray-50 rounded-xl shadow-inner">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Phase Dependency Flow</h3>
-                <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8">
-                    
-                    <div class="p-3 bg-gray-500/20 border border-gray-500 rounded-lg font-semibold text-pcu-dark shadow-md w-40">PILOT (Malaysia)</div>
-                    <svg class="w-6 h-6 sm:w-10 sm:h-6 text-pcu-teal transform rotate-90 sm:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                    
-                    <div class="p-3 bg-pcu-teal/20 border border-pcu-teal rounded-lg font-semibold text-pcu-dark shadow-md w-40">PHASE 1 (Foundation)</div>
-                    <svg class="w-6 h-6 sm:w-10 sm:h-6 text-pcu-blue transform rotate-90 sm:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                    
-                    <div class="p-3 bg-pcu-blue/20 border border-pcu-blue rounded-lg font-semibold text-pcu-dark shadow-md w-40">PHASE 2 (Saturation)</div>
-                    <svg class="w-6 h-6 sm:w-10 sm:h-6 text-pcu-dark transform rotate-90 sm:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                    
-                    <div class="p-3 bg-pcu-dark/20 border border-pcu-dark rounded-lg font-semibold text-pcu-dark shadow-md w-40">PHASE 3 (Global Scale)</div>
-                </div>
-            </div>
-
-            <!-- 5b. Geographic Scaling Map (Heatmap Alternative) -->
-            <div class="max-w-5xl mx-auto p-6 bg-gray-100 rounded-xl shadow-inner mb-16">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Geographic Market Rollout</h3>
-                <div class="map-area bg-white rounded-lg border border-gray-300 relative overflow-hidden">
-                    
-                    <!-- Simplified World Map Representation -->
-                    <div class="absolute inset-0 opacity-10 font-extrabold text-gray-400 text-center text-6xl leading-tight pointer-events-none">
-                        GLOBAL<br>DEPLOYMENT
-                    </div>
-
-                    <!-- P3: Global Deployment Area (Europe, N. America, LATAM) -->
-                    <div class="absolute w-full h-full bg-pcu-dark/10"></div>
-                    <span class="absolute top-1/4 left-1/4 text-sm font-bold text-pcu-dark">Europe / N. America</span>
-                    
-                    <!-- P2: SEA Saturation Area -->
-                    <div class="absolute w-3/4 h-3/4 bottom-0 right-0 bg-pcu-blue/10"></div>
-                    <span class="absolute bottom-1/4 right-1/4 text-sm font-bold text-pcu-blue">Full SEA Saturation</span>
-                    
-                    <!-- P1: Initial Replication Area -->
-                    <div class="absolute w-1/3 h-1/3 bottom-10 right-10 bg-pcu-teal/10"></div>
-                    <span class="absolute bottom-1/2 right-1/2 text-sm font-bold text-pcu-teal">Initial SEA Markets (3)</span>
-                    
-                    <!-- Key Dots -->
-                    <div class="geo-dot bg-gray-600 border-2 border-white" style="top: 80%; left: 70%; animation-delay: 0s;" title="Pilot Market (Malaysia)"></div>
-                    <div class="geo-dot bg-pcu-teal border-2 border-white" style="top: 75%; left: 65%; animation-delay: 0.5s;" title="Phase 1 Replication Market"></div>
-                    <div class="geo-dot bg-pcu-blue border-2 border-white" style="top: 85%; left: 75%; animation-delay: 1s;" title="Phase 2 Saturation Market"></div>
-                    <div class="geo-dot bg-pcu-dark border-2 border-white" style="top: 40%; left: 20%; animation-delay: 1.5s;" title="Phase 3 Global Market"></div>
-                    <div class="geo-dot bg-pcu-dark border-2 border-white" style="top: 30%; left: 70%; animation-delay: 2s;" title="Phase 3 Global Market"></div>
-
-                </div>
-                <div class="flex justify-center space-x-6 mt-4 text-xs font-medium">
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-600 mr-2"></span>Pilot: Malaysia Validation</span>
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-pcu-teal mr-2"></span>Phase 1: Regional Replication</span>
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-pcu-blue mr-2"></span>Phase 2: SEA Saturation</span>
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-pcu-dark mr-2"></span>Phase 3: Global Deployment</span>
-                </div>
-            </div>
-
-            <!-- 5c. DETAILED SCALING GANTT CHART -->
-            <h3 class="text-2xl font-extrabold text-center text-pcu-dark mb-8">
-                Development and Scaling Gantt Chart
-            </h3>
-            <p class="text-center text-gray-600 mb-6">
-                Tracking key deliverables and technical dependencies over time (Time Scale: Month)
-            </p>
-            <div id="gantt-chart-container" class="gantt-container overflow-x-auto rounded-xl border border-gray-200 p-4 bg-gray-50 shadow-inner">
-                <svg id="gantt-chart"></svg>
-            </div>
-        </section>
-        
-        <!-- FOOTER -->
-        <footer class="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
-            Prepared by Ahmad Qaiyum, Peterson Solutions (Malaysia)
-        </footer>
-
+      <div style={{ background: "var(--color-background-secondary)", borderRadius: 10, padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <div>
+          <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>Monthly saving</div>
+          <div style={{ fontSize: 20, fontWeight: 500, color: BRAND }}>{fmt(saving, s, c)}</div>
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>Cost reduction</div>
+          <div style={{ fontSize: 20, fontWeight: 500, color: BRAND }}>{savingPct}%</div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>Annual saving</div>
+          <div style={{ fontSize: 20, fontWeight: 500, color: BRAND }}>{fmt(annualSaving, s, c)}</div>
+        </div>
+      </div>
+      <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>* Default figures are market estimates. Adjust sliders to reflect your actual context.</div>
     </div>
+  );
+}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const tasks = [
-                // Pilot Phase: Malaysia (Nov 2025 - Feb 2026)
-                {
-                    id: 'pilot_malaysia',
-                    name: 'Malaysia Pilot Deployment & Validation',
-                    start: '2025-11-01',
-                    end: '2026-02-28',
-                    progress: 100, // Assuming initial deployment is done, now validation
-                    custom_class: 'pilot-phase',
-                },
-                
-                // Phase 1: Short Term (Starting March 2026)
-                {
-                    id: 'p1_playbook',
-                    name: 'Refine Playbook & Localization SOPs',
-                    start: '2026-03-01',
-                    end: '2026-04-30',
-                    progress: 0,
-                    custom_class: 'short-term',
-                    dependencies: 'pilot_malaysia',
-                },
-                {
-                    id: 'p1_market_rep',
-                    name: 'Regional Replication (2 New SEA Markets)',
-                    start: '2026-05-01',
-                    end: '2026-07-31',
-                    progress: 0,
-                    custom_class: 'short-term',
-                    dependencies: 'p1_playbook',
-                },
-                {
-                    id: 'p1_dashboard',
-                    name: 'Unified Regional Data Dashboard',
-                    start: '2026-05-01',
-                    end: '2026-08-31',
-                    progress: 0,
-                    custom_class: 'short-term',
-                },
+function Timeline() {
+  const [country, setCountry] = useState("Malaysia");
+  const [showCountryDrop, setShowCountryDrop] = useState(false);
 
-                // Phase 2: Mid Term (Starting Sep 2026)
-                {
-                    id: 'p2_sea_sat',
-                    name: 'SEA Saturation (Remaining Markets)',
-                    start: '2026-09-01',
-                    end: '2027-01-31',
-                    progress: 0,
-                    custom_class: 'mid-term',
-                    dependencies: 'p1_market_rep, p1_dashboard',
-                },
-                {
-                    id: 'p2_voice',
-                    name: 'Develop Voice Note Processing',
-                    start: '2026-10-01',
-                    end: '2027-03-31',
-                    progress: 0,
-                    custom_class: 'mid-term',
-                },
-                {
-                    id: 'p2_gov',
-                    name: 'Regional AI Governance Framework',
-                    start: '2027-02-01',
-                    end: '2027-05-31',
-                    progress: 0,
-                    custom_class: 'mid-term',
-                },
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const allMonths = [];
+  [2025,2026,2027,2028].forEach(y => monthNames.forEach(m => allMonths.push(`${m} ${y}`)));
 
-                // Phase 3: Long Term (Starting June 2027)
-                {
-                    id: 'p3_global_deploy',
-                    name: 'Global Deployment (Tier 1 Markets)',
-                    start: '2027-06-01',
-                    end: '2028-06-30',
-                    progress: 0,
-                    custom_class: 'long-term',
-                    dependencies: 'p2_gov',
-                },
-                {
-                    id: 'p3_integration',
-                    name: 'Post-Sales Integration (Client Lifecycle)',
-                    start: '2027-10-01',
-                    end: '2028-10-31',
-                    progress: 0,
-                    custom_class: 'long-term',
-                    dependencies: 'p3_global_deploy',
-                },
-                {
-                    id: 'p3_optimize',
-                    name: 'Autonomous Optimization Implementation',
-                    start: '2028-04-01',
-                    end: '2028-12-31',
-                    progress: 0,
-                    custom_class: 'long-term',
-                    dependencies: 'p3_integration',
-                }
-            ];
+  const now = new Date();
+  const bufferDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const defaultStart = `${monthNames[bufferDate.getMonth()]} ${bufferDate.getFullYear()}`;
+  const [startMonth, setStartMonth] = useState(defaultStart);
 
-            // Initialize Gantt Chart
-            const gantt = new Gantt("#gantt-chart", tasks, {
-                header_height: 50,
-                column_width: 30,
-                step: 24,
-                view_modes: ['Month'],
-                bar_height: 20,
-                bar_corner_radius: 3,
-                arrow_curve: 5,
-                padding: 18,
-                language: 'en',
-                date_format: 'YYYY-MM-DD',
-                view_mode: 'Month',
-            });
-            gantt.change_view_mode('Month');
-        });
-    </script>
-</body>
-</html>
+  const countries = CURRENCIES.map(c => ({ name: c.name, flag: c.flag }));
+  const selCountry = countries.find(c => c.name === country) || countries[0];
+
+  function monthLabel(startStr, offsetMonths) {
+    const idx = allMonths.indexOf(startStr);
+    if (idx < 0) return "";
+    return allMonths[Math.min(idx + offsetMonths, allMonths.length - 1)] || "";
+  }
+
+  const phases = [
+    { ...PHASE_TEMPLATES[0], period: `${startMonth} – ${monthLabel(startMonth, 1)}` },
+    { ...PHASE_TEMPLATES[1], period: `${monthLabel(startMonth, 2)} – ${monthLabel(startMonth, 3)}` },
+    { ...PHASE_TEMPLATES[2], period: `${monthLabel(startMonth, 4)} – ${monthLabel(startMonth, 5)}` },
+    { ...PHASE_TEMPLATES[3], period: `${monthLabel(startMonth, 6)}+` },
+  ];
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
+        <div style={{ position: "relative" }}>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>Country / Market</div>
+          <button onClick={() => setShowCountryDrop(!showCountryDrop)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 8, border: `1.5px solid ${BRAND}`, background: BRAND_LIGHT, color: BRAND_DARK, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+            <span style={{ fontSize: 15 }}>{selCountry.flag}</span> {selCountry.name} ▾
+          </button>
+          {showCountryDrop && (
+            <div style={{ position: "absolute", top: 58, left: 0, zIndex: 10, background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "0.5px solid var(--color-border-secondary)", borderRadius: 10, width: 200, maxHeight: 220, overflowY: "auto" }}>
+              {countries.map(c => (
+                <div key={c.name} onClick={() => { setCountry(c.name); setShowCountryDrop(false); }} style={{ padding: "8px 12px", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, background: c.name === country ? "rgba(29,158,117,0.12)" : "transparent", color: c.name === country ? BRAND_DARK : "var(--color-text-primary)" }}>
+                  <span style={{ fontSize: 14 }}>{c.flag}</span> {c.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>Onboarding start month</div>
+          <select value={startMonth} onChange={e => setStartMonth(e.target.value)} style={{ padding: "6px 10px", borderRadius: 8, fontSize: 13 }}>
+            {allMonths.filter(m => {
+              const [mn, yr] = m.split(" ");
+              const mIdx = monthNames.indexOf(mn);
+              const mDate = new Date(+yr, mIdx, 1);
+              return mDate >= bufferDate;
+            }).map(m => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={{ background: BRAND_LIGHT, border: `0.5px solid #9FE1CB`, borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 13, color: BRAND_DARK }}>
+        <span style={{ fontWeight: 500 }}>{selCountry.flag} {selCountry.name}</span> — AI Assistant deployment starting <span style={{ fontWeight: 500 }}>{startMonth}</span>. Full deployment by <span style={{ fontWeight: 500 }}>{monthLabel(startMonth, 6)}</span>.
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {phases.map((p, i) => (
+          <div key={p.name} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 3 }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: p.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 500, flexShrink: 0 }}>{i + 1}</div>
+              {i < phases.length - 1 && <div style={{ width: 1, height: 28, background: "var(--color-border-tertiary)", marginTop: 4 }} />}
+            </div>
+            <div style={{ background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: 10, padding: "12px 14px", flex: 1 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
+                <div>
+                  <span style={{ fontWeight: 500, fontSize: 14 }}>{p.title}</span>
+                  <span style={{ fontSize: 11, color: "var(--color-text-secondary)", marginLeft: 8 }}>{p.name}</span>
+                </div>
+                <span style={{ fontSize: 11, color: "var(--color-text-secondary)", whiteSpace: "nowrap", marginLeft: 8 }}>{p.period}</span>
+              </div>
+              <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{p.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 18, padding: "12px 14px", background: "var(--color-background-secondary)", borderRadius: 10, fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
+        <span style={{ fontWeight: 500, color: "var(--color-text-primary)" }}>Implementation lead:</span> Ahmad Qaiyum · Peterson Solutions (Malaysia) · Available for country-level project consulting engagement. Each market follows this same 6-month framework, localised to language, SOPs, and certification requirements.
+      </div>
+    </div>
+  );
+}
+
+function ChatDemo() {
+  const [msgs, setMsgs] = useState([
+    { role: "assistant", text: "Hi! I'm the Peterson Sustainability Assistant. I'm here to help qualify your enquiry and connect you with the right expert. To get started, could I get your full name and company?" }
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
+
+  async function send() {
+    const text = input.trim();
+    if (!text || loading) return;
+    const newMsgs = [...msgs, { role: "user", text }];
+    setMsgs(newMsgs);
+    setInput("");
+    setLoading(true);
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: SYSTEM_PROMPT,
+          messages: newMsgs.map(m => ({ role: m.role, content: m.text }))
+        })
+      });
+      const data = await res.json();
+      const reply = data.content?.find(b => b.type === "text")?.text || "Sorry, I couldn't process that.";
+      setMsgs(prev => [...prev, { role: "assistant", text: reply }]);
+    } catch {
+      setMsgs(prev => [...prev, { role: "assistant", text: "Connection issue. Please try again." }]);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div style={{ border: "0.5px solid var(--color-border-tertiary)", borderRadius: 12, overflow: "hidden" }}>
+      <div style={{ background: BRAND, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🌿</div>
+        <div>
+          <div style={{ color: "#fff", fontWeight: 500, fontSize: 14 }}>Peterson Sustainability Assistant</div>
+          <div style={{ color: "#9FE1CB", fontSize: 11 }}>Powered by AI · Online 24/7</div>
+        </div>
+      </div>
+      <div style={{ height: 280, overflowY: "auto", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10, background: "#F9FAFB" }}>
+        {msgs.map((m, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
+            <div style={{ maxWidth: "78%", padding: "8px 12px", borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: m.role === "user" ? BRAND : "#fff", color: m.role === "user" ? "#fff" : "var(--color-text-primary)", fontSize: 13, lineHeight: 1.5, border: m.role === "assistant" ? "0.5px solid var(--color-border-tertiary)" : "none" }}>{m.text}</div>
+          </div>
+        ))}
+        {loading && (
+          <div style={{ display: "flex", justifyContent: "flex-start" }}>
+            <div style={{ padding: "8px 14px", borderRadius: "14px 14px 14px 4px", background: "#fff", border: "0.5px solid var(--color-border-tertiary)", fontSize: 13, color: "var(--color-text-secondary)" }}>Typing…</div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <div style={{ display: "flex", gap: 8, padding: "10px 12px", borderTop: "0.5px solid var(--color-border-tertiary)", background: "#fff" }}>
+        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Type a message…" style={{ flex: 1, fontSize: 13 }} />
+        <button onClick={send} disabled={loading || !input.trim()} style={{ padding: "6px 16px", background: BRAND, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", opacity: loading || !input.trim() ? 0.5 : 1 }}>Send</button>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [tab, setTab] = useState("roi");
+  const tabs = [
+    { id: "roi", label: "ROI Calculator" },
+    { id: "timeline", label: "Country Timeline" },
+    { id: "demo", label: "Live Demo" },
+  ];
+
+  return (
+    <div style={{ fontFamily: "var(--font-sans)", maxWidth: 720, margin: "0 auto", padding: "1.5rem 1rem" }}>
+      <h2 className="sr-only">Peterson Solutions AI Chatbot — Global Pitch Tool</h2>
+
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: BRAND }} />
+          <span style={{ fontSize: 12, color: "var(--color-text-secondary)", fontWeight: 500 }}>PETERSON SOLUTIONS · GLOBAL AI INITIATIVE</span>
+        </div>
+        <h1 style={{ fontSize: 22, fontWeight: 500, margin: "0 0 6px", color: "var(--color-text-primary)" }}>AI Sustainability Assistant</h1>
+        <p style={{ fontSize: 14, color: "var(--color-text-secondary)", margin: 0 }}>A market-by-market adoption framework. Any country team can onboard — see your numbers, your timeline, your ROI.</p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 22 }}>
+        {STATS.map(s => (
+          <div key={s.label} style={{ background: "var(--color-background-secondary)", borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 20, fontWeight: 500, color: BRAND }}>{s.value}</div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-primary)", marginTop: 2 }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>{s.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: 4, marginBottom: 16, borderBottom: "0.5px solid var(--color-border-tertiary)" }}>
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: "8px 16px", fontSize: 13, fontWeight: tab === t.id ? 500 : 400, background: "transparent", border: "none", borderBottom: tab === t.id ? `2px solid ${BRAND}` : "2px solid transparent", color: tab === t.id ? BRAND : "var(--color-text-secondary)", cursor: "pointer", marginBottom: -1 }}>{t.label}</button>
+        ))}
+      </div>
+
+      {tab === "roi" && (
+        <div>
+          <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}>Select your market and adjust the sliders to see a real cost comparison between a human triage team and the AI assistant — in your local currency.</p>
+          <ROICalculator />
+        </div>
+      )}
+
+      {tab === "timeline" && (
+        <div>
+          <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}>Select your country and preferred start month. The 6-month onboarding framework adapts to any market — same structure, localised execution.</p>
+          <Timeline />
+        </div>
+      )}
+
+      {tab === "demo" && (
+        <div>
+          <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 14 }}>Experience the AI assistant firsthand. Try it as a new client enquiring about RSPO or FSC certification — this is exactly what your leads will interact with.</p>
+          <ChatDemo />
+        </div>
+      )}
+
+      <div style={{ marginTop: 24, fontSize: 11, color: "var(--color-text-secondary)", borderTop: "0.5px solid var(--color-border-tertiary)", paddingTop: 12, display: "flex", justifyContent: "space-between" }}>
+        <span>Peterson Solutions · AI Communication Tool · Global Rollout Planner</span>
+        <span>Ahmad Qaiyum · Implementation Lead · PCU Global AI Expert Team</span>
+      </div>
+    </div>
+  );
+}
