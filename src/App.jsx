@@ -279,7 +279,7 @@ function ChatDemo() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "model: "claude-sonnet-4-5",
+          model: "claude-sonnet-4-5",
           max_tokens: 1000,
           system: SYSTEM_PROMPT,
           messages: newMsgs.map(m => ({ role: m.role, content: m.text }))
