@@ -24,6 +24,23 @@ export default {
           body: JSON.stringify(body),
         });
         const data = await res.json();
+
+        // Log to Google Sheets
+        const lastMsg = body.messages[body.messages.length - 1]?.content || "";
+        const conversation = body.messages
+          .map(m => `${m.role.toUpperCase()}: ${m.content}`)
+          .join(" | ");
+        fetch(env.SHEETS_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            timestamp: new Date().toISOString(),
+            conversation: conversation,
+            lastMessage: lastMsg,
+            sessionId: Math.random().toString(36).slice(2, 9)
+          })
+        });
+
         return new Response(JSON.stringify(data), {
           headers: {
             "Content-Type": "application/json",
