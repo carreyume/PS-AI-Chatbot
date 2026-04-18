@@ -25,19 +25,25 @@ export default {
         });
         const data = await res.json();
 
-        // Log to Google Sheets
+        // Log to Airtable
         const lastMsg = body.messages[body.messages.length - 1]?.content || "";
         const conversation = body.messages
           .map(m => `${m.role.toUpperCase()}: ${m.content}`)
           .join(" | ");
-        fetch(env.SHEETS_WEBHOOK_URL, {
+
+        fetch("https://api.airtable.com/v0/app7DmMJ9iAnbeVYl/tblPrlzzOx3wUDViO", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${env.AIRTABLE_API_KEY}`,
+          },
           body: JSON.stringify({
-            timestamp: new Date().toISOString(),
-            conversation: conversation,
-            lastMessage: lastMsg,
-            sessionId: Math.random().toString(36).slice(2, 9)
+            fields: {
+              "Timestamp": new Date().toISOString(),
+              "Conversation": conversation,
+              "Last Message": lastMsg,
+              "Session ID": Math.random().toString(36).slice(2, 9)
+            }
           })
         });
 
